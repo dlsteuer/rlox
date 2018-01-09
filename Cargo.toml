@@ -1,0 +1,6 @@
+[package]
+name = "rlox"
+version = "0.1.0"
+authors = ["Daniel Steuernol <daniel@sendwithus.com>"]
+
+[dependencies]
