@@ -1,0 +1,22 @@
+this is a line
+this
+is
+a
+line
+exit
+this
+is 
+a
+test
+this is a test
+()
+!
+!=
+!
+!=
+(){{}}
+({})
+(
+((
+({
+({}
