@@ -108,9 +108,9 @@ impl Scanner {
     }
 
     fn add_token_with_literal<T: Literal + 'static>(&mut self, token_type: TokenType, literal: T) {
-        let text = self.source
-            .substring(self.start as usize, self.current as usize);
-        println!("{}, {}, {}", self.start, self.current, self.source);
+        let s = self.start as usize;
+        let c = self.current as usize;
+        let text = self.source.substring(s, c - s);
         match token_type {
             TokenType::EOF => self.tokens.push(Token::new(
                 token_type,

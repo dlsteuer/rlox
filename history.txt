@@ -20,3 +20,9 @@ this is a test
 ((
 ({
 ({}
+{
+{{
+{{{
+exit
+.exit
+{{{
