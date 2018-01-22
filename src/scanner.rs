@@ -1,4 +1,4 @@
-use token::{Literal, NullLiteral, StringLiteral, Token};
+use token::{Literal, NullLiteral, NumberLiteral, StringLiteral, Token};
 use token_type::TokenType;
 use util::StringUtils;
 
@@ -74,9 +74,48 @@ impl Scanner {
             Some('\t') => (),
             Some('\n') => self.line += 1,
             Some('"') => self.parse_string_literal(),
-            Some(val) => println!("Unknown character: {} ({})", val, self.line),
+            Some(val) => {
+                if self.is_digit(Some(val)) {
+                    self.parse_number()
+                } else {
+                    println!("Unknown character: {} ({})", val, self.line)
+                }
+            }
             None => println!("invalid input"),
         }
+    }
+
+    fn is_digit(&self, val: Option<char>) -> bool {
+        match val {
+            None => false,
+            Some(val) => val >= '0' && val <= '9',
+        }
+    }
+
+    fn parse_number(&mut self) {
+        let mut l = true;
+        while l {
+            let token = self.peek_token();
+            l = self.is_digit(token);
+            self.advance();
+        }
+
+        let next = self.peek_next_token();
+        if self.peek_token() == Some('.') && self.is_digit(next) {
+            self.advance();
+
+            l = true;
+            while l {
+                let token = self.peek_token();
+                l = self.is_digit(token);
+                self.advance();
+            }
+        }
+
+        let s = self.start as usize;
+        let c = self.current as usize;
+        let lit = self.source.substring(s, c - s);
+        self.add_token_with_literal(TokenType::Number, NumberLiteral::new(lit));
     }
 
     fn parse_string_literal(&mut self) {
@@ -105,11 +144,20 @@ impl Scanner {
         println!("[line {}] Error: {}", self.line, msg);
     }
 
-    fn peek_token(&mut self) -> Option<char> {
-        if self.is_at_end() {
-            return Some('\0');
+    fn peek_next_token(&self) -> Option<char> {
+        if (self.current + 1) as usize >= self.source.len() {
+            Some('\0')
+        } else {
+            self.source.chars().nth((self.current + 1) as usize)
         }
-        return self.source.chars().nth(self.current as usize);
+    }
+
+    fn peek_token(&self) -> Option<char> {
+        if self.is_at_end() {
+            Some('\0')
+        } else {
+            self.source.chars().nth(self.current as usize)
+        }
     }
 
     fn match_token(&mut self, c: char) -> bool {

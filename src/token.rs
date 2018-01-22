@@ -73,3 +73,23 @@ impl Literal for StringLiteral {
         })
     }
 }
+
+pub struct NumberLiteral {
+    val: String,
+}
+
+impl NumberLiteral {
+    pub fn new(val: String) -> Self {
+        NumberLiteral { val: val }
+    }
+}
+impl Literal for NumberLiteral {
+    fn to_string(self: Box<Self>) -> String {
+        self.val
+    }
+    fn box_clone(&self) -> Box<Literal> {
+        Box::new(StringLiteral {
+            val: self.val.clone(),
+        })
+    }
+}
