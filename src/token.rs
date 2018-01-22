@@ -53,3 +53,23 @@ impl Literal for NullLiteral {
         Box::new(NullLiteral {})
     }
 }
+
+pub struct StringLiteral {
+    val: String,
+}
+
+impl StringLiteral {
+    pub fn new(val: String) -> Self {
+        StringLiteral { val: val }
+    }
+}
+impl Literal for StringLiteral {
+    fn to_string(self: Box<Self>) -> String {
+        self.val
+    }
+    fn box_clone(&self) -> Box<Literal> {
+        Box::new(StringLiteral {
+            val: self.val.clone(),
+        })
+    }
+}

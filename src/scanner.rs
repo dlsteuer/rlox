@@ -1,4 +1,4 @@
-use token::{Literal, NullLiteral, Token};
+use token::{Literal, NullLiteral, StringLiteral, Token};
 use token_type::TokenType;
 use util::StringUtils;
 
@@ -8,6 +8,7 @@ pub struct Scanner {
     current: i64,
     line: i64,
     tokens: Vec<Token>,
+    error: bool,
 }
 
 impl Scanner {
@@ -18,6 +19,7 @@ impl Scanner {
             current: 0,
             line: 1,
             tokens: Vec::new(),
+            error: false,
         }
     }
 
@@ -71,9 +73,36 @@ impl Scanner {
             Some('\r') => (),
             Some('\t') => (),
             Some('\n') => self.line += 1,
+            Some('"') => self.parse_string_literal(),
             Some(val) => println!("Unknown character: {} ({})", val, self.line),
             None => println!("invalid input"),
         }
+    }
+
+    fn parse_string_literal(&mut self) {
+        while self.peek_token() != Some('"') && !self.is_at_end() {
+            if self.peek_token() == Some('\n') {
+                self.line += 1;
+            }
+            self.advance();
+        }
+
+        if self.is_at_end() {
+            self.show_error(String::from("Unterminated string"));
+            return;
+        }
+
+        self.advance();
+
+        let s = (self.start as usize) + 1;
+        let c = (self.current as usize) - 1;
+        let lit = self.source.substring(s, c - s);
+        self.add_token_with_literal(TokenType::String, StringLiteral::new(lit));
+    }
+
+    fn show_error(&mut self, msg: String) {
+        self.error = true;
+        println!("[line {}] Error: {}", self.line, msg);
     }
 
     fn peek_token(&mut self) -> Option<char> {
